@@ -2,61 +2,106 @@
 
 A modular, open-source Python toolkit for extracting measurable acoustic features from audio recordings.
 
-> **Status:** Planning and documentation. Audio processing code has not been implemented yet.
+> **Status:** Early implementation. The core package can load local audio, preserve or resample sample rate, and report duration, RMS amplitude, sample rate, and sample count. Automated tests run across Python 3.10–3.12.
 
 ## Purpose
 
 Optic Audio Engine is an independent audio-analysis component designed to support research, experimentation, and future integrations with speech-feedback applications. Its goal is to produce **explainable, reproducible measurements**, not to judge a person's confidence, personality, or identity.
 
-## Planned features
+## Implemented
 
-- Load and validate WAV recordings
-- Measure duration and root-mean-square (RMS) amplitude
+- Load local audio files with librosa
+- Convert input to mono for consistent analysis
+- Preserve the source sample rate or resample to a requested rate
+- Measure duration in seconds
+- Measure root-mean-square (RMS) waveform amplitude
+- Report sample rate and sample count
+- Return measurements through a typed `AudioSummary` object
+- Convert results to a JSON-serializable dictionary
+- Reject missing files, invalid sample rates, empty recordings, and non-finite samples
+- Test duration, RMS, resampling, and invalid input behavior with pytest
+- Run the test suite in CI on Python 3.10, 3.11, and 3.12
+
+## Next features
+
 - Estimate fundamental frequency (pitch) where detectable
 - Identify silent intervals using configurable thresholds
-- Produce machine-readable, JSON-compatible analysis results
-- Validate behavior with synthetic fixtures and automated tests
+- Expand machine-readable feature output
+- Add reusable synthetic audio fixtures and examples
+- Document measurement assumptions for each additional acoustic feature
 
-## Proposed technology
+## Technology
 
 - **Python** for package architecture and processing
 - **NumPy** for numerical operations
-- **librosa** for audio and spectral analysis
-- **pytest** for repeatable unit and integration tests
+- **librosa** for audio loading and signal processing
+- **pytest** for repeatable tests
+- **GitHub Actions** for the Python compatibility test matrix
 
-## Planned package layout
+## Package layout
 
 ```text
 optic-audio-engine/
 ├── src/optic_audio/
 │   ├── __init__.py
-│   ├── analyzer.py
-│   └── features.py
+│   └── analyzer.py
 ├── tests/
-├── examples/
+│   └── test_analyzer.py
 ├── docs/
 │   ├── architecture.md
 │   └── roadmap.md
+├── .github/workflows/
+│   └── tests.yml
 ├── pyproject.toml
 └── README.md
 ```
 
-This layout is a proposal; the implementation files will arrive in future commits.
+## Current API
 
-## Example target output
+```python
+from optic_audio import analyze_audio
 
-The following values are **illustrative only**:
+summary = analyze_audio("recording.wav")
+
+print(summary.duration_seconds)
+print(summary.rms)
+print(summary.sample_rate_hz)
+print(summary.sample_count)
+print(summary.to_dict())
+```
+
+An optional target sample rate can be supplied:
+
+```python
+summary = analyze_audio("recording.wav", sample_rate=16_000)
+```
+
+## Example output
 
 ```json
 {
   "duration_seconds": 8.4,
   "rms": 0.12,
-  "estimated_pitch_hz": 187.5,
-  "silence_ratio": 0.18
+  "sample_rate_hz": 44100,
+  "sample_count": 370440
 }
 ```
 
-Pitch can be unavailable on unvoiced, silent, or noisy recordings. Metrics will include documented units and measurement assumptions.
+RMS is relative to the normalized waveform sample scale. It is **not** a calibrated sound-pressure measurement such as dB SPL.
+
+## Development
+
+Install the package with development dependencies:
+
+```bash
+python -m pip install -e ".[dev]"
+```
+
+Run the tests:
+
+```bash
+pytest
+```
 
 ## Documentation
 
@@ -65,11 +110,11 @@ Pitch can be unavailable on unvoiced, silent, or noisy recordings. Metrics will 
 
 ## Privacy and scope
 
-Local-first processing is the intended default. No recording uploads or cloud APIs are required for the proposed core engine. Voice measurements alone cannot reliably infer emotions, credibility, personality, or medical conditions.
+Local-first processing is the default. The current engine reads local files and does not require recording uploads or cloud APIs. Voice measurements alone cannot reliably infer emotions, credibility, personality, identity, or medical conditions.
 
 ## Contributing
 
-Feature suggestions, reproducible bug reports, and tests are welcome once the implementation begins.
+Feature suggestions, reproducible bug reports, and focused tests are welcome. New measurements should include documented units, assumptions, failure behavior, and repeatable tests.
 
 ## License
 
