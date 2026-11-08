@@ -1,6 +1,6 @@
 # Roadmap
 
-This roadmap tracks planned milestones, not completed features.
+This roadmap tracks planned milestones and completed engineering work.
 
 ## Milestone 0: Documentation and scope
 
@@ -12,28 +12,29 @@ This roadmap tracks planned milestones, not completed features.
 
 ## Milestone 1: Minimal working Python package
 
-- [ ] Add `pyproject.toml` and `src/optic_audio` package
-- [ ] Implement WAV loading and validation
-- [ ] Calculate duration and RMS amplitude
-- [ ] Write pytest tests for synthetic signals
+- [x] Add `pyproject.toml` and `src/optic_audio` package
+- [x] Implement WAV loading and validation
+- [x] Calculate duration and RMS amplitude
+- [x] Write pytest tests for synthetic signals
 - [ ] Add a CLI or local example script
 
 **Acceptance criteria:** package can be installed locally; tests pass; a WAV file produces duration and RMS results.
 
 ## Milestone 2: Acoustic features
 
-- [ ] Pitch estimation on voiced segments
+- [x] Pitch estimation on voiced segments
 - [ ] Configurable silence detection
-- [ ] Well-defined null/unknown values and units
-- [ ] Tests for silence, tones, stereo, and sample-rate differences
+- [x] Well-defined null/unknown pitch values and units
+- [x] Tests for silence, tones, and sample-rate differences
+- [ ] Add explicit stereo-input coverage
 
 **Acceptance criteria:** documented outputs and tests cover expected numerical behavior and failure cases.
 
 ## Milestone 3: Engineering quality
 
-- [ ] GitHub Actions CI for automated tests
+- [x] GitHub Actions CI for automated tests
 - [ ] Type checking / linting
-- [ ] API documentation and usage examples
+- [x] API documentation and usage examples
 - [ ] Versioned releases and change log
 
 ## Milestone 4: Integration readiness
@@ -48,4 +49,4 @@ The initial project does not claim to infer confidence, identity, mental state, 
 
 ## Suggested next commit
 
-`feat: bootstrap Python package with WAV analysis and pytest`
+`feat: add configurable silence interval detection`

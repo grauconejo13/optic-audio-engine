@@ -1,4 +1,4 @@
-"""Regression tests for the basic Optic audio analyzer.
+"""Regression tests for the Optic audio analyzer.
 
 Run after installing the package with: pip install -e ".[dev]"
 Then: pytest
@@ -24,7 +24,7 @@ def write_pcm16_wav(path, samples, sample_rate=16000):
         stream.writeframes(pcm.tobytes())
 
 
-def test_sine_wave_duration_and_rms(tmp_path):
+def test_sine_wave_duration_rms_and_pitch(tmp_path):
     sr = 16000
     t = np.arange(sr, dtype=np.float64) / sr
     samples = 0.5 * np.sin(2 * np.pi * 440 * t)
@@ -37,15 +37,30 @@ def test_sine_wave_duration_and_rms(tmp_path):
     assert result.sample_count == sr
     assert result.sample_rate_hz == sr
     assert result.rms == pytest.approx(0.5 / math.sqrt(2), abs=1e-3)
+    assert result.fundamental_frequency_hz == pytest.approx(440.0, abs=3.0)
     assert result.to_dict()["rms"] == result.rms
+    assert result.to_dict()["fundamental_frequency_hz"] == result.fundamental_frequency_hz
 
 
-def test_silence_has_zero_rms(tmp_path):
+def test_second_tone_tracks_different_fundamental_frequency(tmp_path):
+    sr = 22050
+    t = np.arange(sr, dtype=np.float64) / sr
+    samples = 0.4 * np.sin(2 * np.pi * 220 * t)
+    path = tmp_path / "a3.wav"
+    write_pcm16_wav(path, samples, sr)
+
+    result = analyze_audio(path)
+
+    assert result.fundamental_frequency_hz == pytest.approx(220.0, abs=3.0)
+
+
+def test_silence_has_zero_rms_and_no_pitch(tmp_path):
     path = tmp_path / "silence.wav"
     write_pcm16_wav(path, np.zeros(8000), sample_rate=8000)
     result = analyze_audio(path)
     assert result.duration_seconds == pytest.approx(1.0)
     assert result.rms == pytest.approx(0.0)
+    assert result.fundamental_frequency_hz is None
 
 
 def test_missing_file_raises(tmp_path):
@@ -68,3 +83,4 @@ def test_resampling_changes_sample_count_not_duration(tmp_path):
     assert result.sample_rate_hz == 8000
     assert result.sample_count == 8000
     assert result.duration_seconds == pytest.approx(1.0)
+    assert result.fundamental_frequency_hz is None
