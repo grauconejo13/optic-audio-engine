@@ -16,7 +16,7 @@ This roadmap tracks planned milestones and completed engineering work.
 - [x] Implement WAV loading and validation
 - [x] Calculate duration and RMS amplitude
 - [x] Write pytest tests for synthetic signals
-- [ ] Add a CLI or local example script
+- [x] Add a CLI for local JSON analysis
 
 ## Milestone 2: Acoustic features
 
@@ -30,7 +30,7 @@ This roadmap tracks planned milestones and completed engineering work.
 
 - [x] GitHub Actions CI for automated tests
 - [ ] Type checking / linting
-- [x] API documentation and usage examples
+- [x] API and CLI documentation with usage examples
 - [ ] Versioned releases and change log
 
 ## Milestone 4: Integration readiness
@@ -45,4 +45,4 @@ The initial project does not claim to infer confidence, identity, mental state, 
 
 ## Suggested next commit
 
-`feat: add command-line JSON analysis`
+`chore: add linting and static type checks`

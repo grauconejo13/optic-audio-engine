@@ -2,7 +2,7 @@
 
 A modular, open-source Python toolkit for extracting measurable acoustic features from audio recordings.
 
-> **Status:** Early implementation. The core package reports duration, RMS amplitude, sample rate, sample count, fundamental frequency where detectable, and configurable silent intervals. Automated tests run across Python 3.10–3.12.
+> **Status:** Early implementation. The package reports duration, RMS amplitude, sample rate, sample count, fundamental frequency where detectable, and configurable silent intervals. It can be used from Python or from the `optic-audio` command line.
 
 ## Purpose
 
@@ -15,15 +15,13 @@ Optic Audio Engine is an independent audio-analysis component designed to suppor
 - Preserve the source sample rate or resample to a requested rate
 - Measure duration in seconds and waveform RMS
 - Estimate median fundamental frequency with pYIN for voiced frames
-- Detect contiguous silent intervals using a configurable normalized-amplitude threshold
-- Configure the minimum silence duration to report
-- Return `None` when no voiced fundamental frequency is detected
-- Return measurements through typed `AudioSummary` and `SilenceInterval` objects
-- Convert results to a JSON-serializable dictionary
-- Test tones, silence, threshold behavior, resampling, and invalid inputs with pytest
+- Detect configurable contiguous silent intervals
+- Return typed Python measurement objects and JSON-serializable output
+- Analyze files from a local CLI
+- Test tones, silence, thresholds, resampling, invalid inputs, and CLI behavior
 - Run the test suite in CI on Python 3.10, 3.11, and 3.12
 
-## Current API
+## Python API
 
 ```python
 from optic_audio import analyze_audio
@@ -34,18 +32,35 @@ summary = analyze_audio(
     min_silence_duration=0.2,
 )
 
-print(summary.duration_seconds)
-print(summary.rms)
 print(summary.fundamental_frequency_hz)
 print(summary.silence_intervals)
 print(summary.to_dict())
 ```
 
-An optional target sample rate can also be supplied:
+## Command line
 
-```python
-summary = analyze_audio("recording.wav", sample_rate=16_000)
+Install the project with development dependencies:
+
+```bash
+python -m pip install -e ".[dev]"
 ```
+
+Then analyze a local file:
+
+```bash
+optic-audio recording.wav
+```
+
+Example with options:
+
+```bash
+optic-audio recording.wav \
+  --sample-rate 16000 \
+  --silence-threshold 0.015 \
+  --min-silence-duration 0.3
+```
+
+The command prints the same JSON-compatible measurement schema exposed by `AudioSummary.to_dict()`. Use `--indent 0` for compact JSON.
 
 ## Example output
 
@@ -70,15 +85,9 @@ RMS and silence thresholds use the normalized waveform sample scale. They are **
 
 Fundamental frequency is estimated with librosa's pYIN implementation across voiced frames, then summarized with the median. The current search range is C2-C7 (approximately 65-2093 Hz). A value of `null` / `None` means the analyzer did not detect voiced pitch reliably enough to report a value.
 
-Silence detection is intentionally simple and explainable: samples at or below the configured absolute-amplitude threshold are grouped into contiguous intervals, and intervals shorter than `min_silence_duration` are discarded. These intervals represent low waveform amplitude, not semantic pauses or speech boundaries.
+Silence detection groups samples at or below the configured absolute-amplitude threshold into contiguous intervals and discards intervals shorter than `min_silence_duration`. These intervals represent low waveform amplitude, not semantic pauses or speech boundaries.
 
 ## Development
-
-Install the package with development dependencies:
-
-```bash
-python -m pip install -e ".[dev]"
-```
 
 Run the tests:
 
