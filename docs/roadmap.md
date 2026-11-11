@@ -29,7 +29,7 @@ This roadmap tracks planned milestones and completed engineering work.
 ## Milestone 3: Engineering quality
 
 - [x] GitHub Actions CI for automated tests
-- [ ] Type checking / linting
+- [x] Ruff linting and mypy static type checks
 - [x] API and CLI documentation with usage examples
 - [ ] Versioned releases and change log
 
@@ -45,4 +45,4 @@ The initial project does not claim to infer confidence, identity, mental state, 
 
 ## Suggested next commit
 
-`chore: add linting and static type checks`
+`test: add explicit stereo-input coverage`
