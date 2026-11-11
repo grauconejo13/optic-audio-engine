@@ -18,17 +18,13 @@ This roadmap tracks planned milestones and completed engineering work.
 - [x] Write pytest tests for synthetic signals
 - [ ] Add a CLI or local example script
 
-**Acceptance criteria:** package can be installed locally; tests pass; a WAV file produces duration and RMS results.
-
 ## Milestone 2: Acoustic features
 
 - [x] Pitch estimation on voiced segments
-- [ ] Configurable silence detection
+- [x] Configurable silence detection
 - [x] Well-defined null/unknown pitch values and units
-- [x] Tests for silence, tones, and sample-rate differences
+- [x] Tests for silence, tones, thresholds, and sample-rate differences
 - [ ] Add explicit stereo-input coverage
-
-**Acceptance criteria:** documented outputs and tests cover expected numerical behavior and failure cases.
 
 ## Milestone 3: Engineering quality
 
@@ -49,4 +45,4 @@ The initial project does not claim to infer confidence, identity, mental state, 
 
 ## Suggested next commit
 
-`feat: add configurable silence interval detection`
+`feat: add command-line JSON analysis`

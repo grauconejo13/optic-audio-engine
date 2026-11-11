@@ -2,7 +2,7 @@
 
 A modular, open-source Python toolkit for extracting measurable acoustic features from audio recordings.
 
-> **Status:** Early implementation. The core package can load local audio, preserve or resample sample rate, and report duration, RMS amplitude, sample rate, sample count, and fundamental frequency where voiced pitch is detectable. Automated tests run across Python 3.10–3.12.
+> **Status:** Early implementation. The core package reports duration, RMS amplitude, sample rate, sample count, fundamental frequency where detectable, and configurable silent intervals. Automated tests run across Python 3.10–3.12.
 
 ## Purpose
 
@@ -13,66 +13,35 @@ Optic Audio Engine is an independent audio-analysis component designed to suppor
 - Load local audio files with librosa
 - Convert input to mono for consistent analysis
 - Preserve the source sample rate or resample to a requested rate
-- Measure duration in seconds
-- Measure root-mean-square (RMS) waveform amplitude
+- Measure duration in seconds and waveform RMS
 - Estimate median fundamental frequency with pYIN for voiced frames
+- Detect contiguous silent intervals using a configurable normalized-amplitude threshold
+- Configure the minimum silence duration to report
 - Return `None` when no voiced fundamental frequency is detected
-- Report sample rate and sample count
-- Return measurements through a typed `AudioSummary` object
+- Return measurements through typed `AudioSummary` and `SilenceInterval` objects
 - Convert results to a JSON-serializable dictionary
-- Reject missing files, invalid sample rates, empty recordings, and non-finite samples
-- Test duration, RMS, pitch, silence, resampling, and invalid input behavior with pytest
+- Test tones, silence, threshold behavior, resampling, and invalid inputs with pytest
 - Run the test suite in CI on Python 3.10, 3.11, and 3.12
-
-## Next features
-
-- Identify silent intervals using configurable thresholds
-- Expand machine-readable feature output
-- Add reusable synthetic audio fixtures and examples
-- Document measurement assumptions for each additional acoustic feature
-
-## Technology
-
-- **Python** for package architecture and processing
-- **NumPy** for numerical operations
-- **librosa** for audio loading and signal processing
-- **pytest** for repeatable tests
-- **GitHub Actions** for the Python compatibility test matrix
-
-## Package layout
-
-```text
-optic-audio-engine/
-├── src/optic_audio/
-│   ├── __init__.py
-│   └── analyzer.py
-├── tests/
-│   └── test_analyzer.py
-├── docs/
-│   ├── architecture.md
-│   └── roadmap.md
-├── .github/workflows/
-│   └── tests.yml
-├── pyproject.toml
-└── README.md
-```
 
 ## Current API
 
 ```python
 from optic_audio import analyze_audio
 
-summary = analyze_audio("recording.wav")
+summary = analyze_audio(
+    "recording.wav",
+    silence_threshold=0.01,
+    min_silence_duration=0.2,
+)
 
 print(summary.duration_seconds)
 print(summary.rms)
-print(summary.sample_rate_hz)
-print(summary.sample_count)
 print(summary.fundamental_frequency_hz)
+print(summary.silence_intervals)
 print(summary.to_dict())
 ```
 
-An optional target sample rate can be supplied:
+An optional target sample rate can also be supplied:
 
 ```python
 summary = analyze_audio("recording.wav", sample_rate=16_000)
@@ -86,13 +55,22 @@ summary = analyze_audio("recording.wav", sample_rate=16_000)
   "rms": 0.12,
   "sample_rate_hz": 44100,
   "sample_count": 370440,
-  "fundamental_frequency_hz": 184.7
+  "fundamental_frequency_hz": 184.7,
+  "silence_intervals": [
+    {
+      "start_seconds": 2.1,
+      "end_seconds": 2.8,
+      "duration_seconds": 0.7
+    }
+  ]
 }
 ```
 
-RMS is relative to the normalized waveform sample scale. It is **not** a calibrated sound-pressure measurement such as dB SPL.
+RMS and silence thresholds use the normalized waveform sample scale. They are **not** calibrated sound-pressure measurements such as dB SPL.
 
-Fundamental frequency is estimated with librosa's pYIN implementation across voiced frames, then summarized with the median. The current search range is C2-C7 (approximately 65-2093 Hz). A value of `null` / `None` means the analyzer did not detect voiced pitch reliably enough to report a value. It should not be interpreted as a judgment about a speaker or recording.
+Fundamental frequency is estimated with librosa's pYIN implementation across voiced frames, then summarized with the median. The current search range is C2-C7 (approximately 65-2093 Hz). A value of `null` / `None` means the analyzer did not detect voiced pitch reliably enough to report a value.
+
+Silence detection is intentionally simple and explainable: samples at or below the configured absolute-amplitude threshold are grouped into contiguous intervals, and intervals shorter than `min_silence_duration` are discarded. These intervals represent low waveform amplitude, not semantic pauses or speech boundaries.
 
 ## Development
 
