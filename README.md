@@ -18,7 +18,7 @@ Optic Audio Engine is an independent audio-analysis component designed to suppor
 - Detect configurable contiguous silent intervals
 - Return typed Python measurement objects and JSON-serializable output
 - Analyze files from a local CLI
-- Test tones, silence, thresholds, resampling, invalid inputs, and CLI behavior
+- Test tones, stereo downmixing, silence, thresholds, resampling, invalid inputs, and CLI behavior
 - Run pytest, Ruff, and mypy in CI on Python 3.10, 3.11, and 3.12
 
 ## Python API

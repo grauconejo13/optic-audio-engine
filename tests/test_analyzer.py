@@ -20,6 +20,22 @@ def write_pcm16_wav(path, samples, sample_rate=16000):
         stream.writeframes(pcm.tobytes())
 
 
+def write_stereo_pcm16_wav(path, left, right, sample_rate=16000):
+    """Write deterministic stereo 16-bit PCM with interleaved channels."""
+    left = np.asarray(left, dtype=np.float64)
+    right = np.asarray(right, dtype=np.float64)
+    if left.shape != right.shape:
+        raise ValueError("Stereo channels must have the same shape")
+
+    stereo = np.column_stack([left, right])
+    pcm = np.round(np.clip(stereo, -1.0, 1.0) * 32767).astype("<i2")
+    with wave.open(str(path), "wb") as stream:
+        stream.setnchannels(2)
+        stream.setsampwidth(2)
+        stream.setframerate(sample_rate)
+        stream.writeframes(pcm.tobytes())
+
+
 def test_sine_wave_duration_rms_and_pitch(tmp_path):
     sr = 16000
     t = np.arange(sr, dtype=np.float64) / sr
@@ -135,6 +151,24 @@ def test_invalid_minimum_silence_duration_raises(tmp_path, duration):
     write_pcm16_wav(path, np.zeros(100))
     with pytest.raises(ValueError, match="min_silence_duration"):
         analyze_audio(path, min_silence_duration=duration)
+
+
+def test_stereo_input_is_downmixed_to_mono_consistently(tmp_path):
+    sr = 16000
+    t = np.arange(sr, dtype=np.float64) / sr
+    left = 0.5 * np.sin(2 * np.pi * 440 * t)
+    right = np.zeros_like(left)
+    path = tmp_path / "stereo-tone.wav"
+    write_stereo_pcm16_wav(path, left, right, sr)
+
+    result = analyze_audio(path)
+
+    assert result.sample_rate_hz == sr
+    assert result.sample_count == sr
+    assert result.duration_seconds == pytest.approx(1.0)
+    assert result.rms == pytest.approx(0.25 / math.sqrt(2), abs=1e-3)
+    assert result.fundamental_frequency_hz == pytest.approx(440.0, abs=3.0)
+    assert result.silence_intervals == ()
 
 
 def test_resampling_changes_sample_count_not_duration(tmp_path):

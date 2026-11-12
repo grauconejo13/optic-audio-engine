@@ -24,7 +24,7 @@ This roadmap tracks planned milestones and completed engineering work.
 - [x] Configurable silence detection
 - [x] Well-defined null/unknown pitch values and units
 - [x] Tests for silence, tones, thresholds, and sample-rate differences
-- [ ] Add explicit stereo-input coverage
+- [x] Add explicit stereo-input coverage
 
 ## Milestone 3: Engineering quality
 
@@ -45,4 +45,4 @@ The initial project does not claim to infer confidence, identity, mental state, 
 
 ## Suggested next commit
 
-`test: add explicit stereo-input coverage`
+`chore: add changelog and release versioning notes`
