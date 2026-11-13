@@ -109,6 +109,8 @@ GitHub Actions runs the same lint, type-check, and test steps across Python 3.10
 
 - [Architecture](docs/architecture.md)
 - [Roadmap](docs/roadmap.md)
+- [Release process](docs/RELEASING.md)
+- [Changelog](CHANGELOG.md)
 
 ## Privacy and scope
 

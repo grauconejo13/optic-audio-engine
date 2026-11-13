@@ -31,7 +31,8 @@ This roadmap tracks planned milestones and completed engineering work.
 - [x] GitHub Actions CI for automated tests
 - [x] Ruff linting and mypy static type checks
 - [x] API and CLI documentation with usage examples
-- [ ] Versioned releases and change log
+- [x] Add changelog and documented semantic-versioning policy
+- [ ] Publish first tagged versioned release
 
 ## Milestone 4: Integration readiness
 
@@ -45,4 +46,4 @@ The initial project does not claim to infer confidence, identity, mental state, 
 
 ## Suggested next commit
 
-`chore: add changelog and release versioning notes`
+`docs: define stable JSON output schema contract`
