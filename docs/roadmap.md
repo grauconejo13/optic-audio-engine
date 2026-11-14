@@ -36,7 +36,7 @@ This roadmap tracks planned milestones and completed engineering work.
 
 ## Milestone 4: Integration readiness
 
-- [ ] Stable JSON-compatible output schema
+- [x] Stable JSON-compatible output schema contract and regression coverage
 - [ ] Performance benchmarks using non-personal test audio
 - [ ] Optional integration with a separate Optic application or API
 
@@ -46,4 +46,4 @@ The initial project does not claim to infer confidence, identity, mental state, 
 
 ## Suggested next commit
 
-`docs: define stable JSON output schema contract`
+`test: add performance benchmark fixture`

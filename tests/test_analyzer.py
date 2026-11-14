@@ -54,6 +54,36 @@ def test_sine_wave_duration_rms_and_pitch(tmp_path):
     assert result.to_dict()["rms"] == result.rms
 
 
+def test_json_compatible_output_schema_is_stable(tmp_path):
+    path = tmp_path / "silence-schema.wav"
+    write_pcm16_wav(path, np.zeros(8000), sample_rate=8000)
+
+    payload = analyze_audio(path).to_dict()
+
+    assert set(payload) == {
+        "duration_seconds",
+        "rms",
+        "sample_rate_hz",
+        "sample_count",
+        "fundamental_frequency_hz",
+        "silence_intervals",
+    }
+    assert isinstance(payload["duration_seconds"], float)
+    assert isinstance(payload["rms"], float)
+    assert isinstance(payload["sample_rate_hz"], int)
+    assert isinstance(payload["sample_count"], int)
+    assert payload["fundamental_frequency_hz"] is None
+
+    intervals = payload["silence_intervals"]
+    assert isinstance(intervals, tuple)
+    assert len(intervals) == 1
+    assert set(intervals[0]) == {
+        "start_seconds",
+        "end_seconds",
+        "duration_seconds",
+    }
+
+
 def test_second_tone_tracks_different_fundamental_frequency(tmp_path):
     sr = 22050
     t = np.arange(sr, dtype=np.float64) / sr
